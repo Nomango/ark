@@ -22,6 +22,18 @@ func CtxGetKVs(ctx context.Context) []KV {
 	return getKVs(ctx)
 }
 
+// FlatKVs returns key-value pairs from flat interface slice
+func FlatKVs(kvis ...interface{}) []KV {
+	if len(kvis)%2 != 0 {
+		kvis = append(kvis, "%MISSING%")
+	}
+	kvs := make([]KV, 0, len(kvis))
+	for i := 0; i < len(kvis); i += 2 {
+		kvs = append(kvs, KV{fmt.Sprint(kvis[i]), kvis[i+1]})
+	}
+	return kvs
+}
+
 type ctxKeyKV string
 
 func withKV(ctx context.Context, kvs ...KV) context.Context {

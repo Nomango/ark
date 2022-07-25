@@ -11,16 +11,17 @@ import (
 // Valuer returns a value
 type Valuer func(ctx context.Context) interface{}
 
-var (
-	// DefaultCaller is a Valuer that returns the file and line.
-	DefaultCaller = Caller(4)
+// KVCallDepth returns a Valuer that returns a pkg/file:line description of the caller.
+func KVCallDepth(key string, depth int) KV {
+	return KV{Key: key, Value: valuerCallDepth(depth)}
+}
 
-	// DefaultTimestamp is a Valuer that returns the current wallclock time.
-	DefaultTimestamp = Timestamp(time.RFC3339)
-)
+// KVTimestamp returns a timestamp Valuer with a custom time format.
+func KVTimestamp(key string, layout string) KV {
+	return KV{Key: key, Value: valuerTimestamp(layout)}
+}
 
-// Caller returns a Valuer that returns a pkg/file:line description of the caller.
-func Caller(depth int) Valuer {
+func valuerCallDepth(depth int) Valuer {
 	return func(context.Context) interface{} {
 		_, file, line, _ := runtime.Caller(depth)
 		idx := strings.LastIndexByte(file, '/')
@@ -28,8 +29,7 @@ func Caller(depth int) Valuer {
 	}
 }
 
-// Timestamp returns a timestamp Valuer with a custom time format.
-func Timestamp(layout string) Valuer {
+func valuerTimestamp(layout string) Valuer {
 	return func(context.Context) interface{} {
 		return time.Now().Format(layout)
 	}
