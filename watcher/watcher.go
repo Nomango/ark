@@ -40,7 +40,11 @@ func Watch(ctx context.Context, n Notifier, f func(interface{})) {
 	}()
 }
 
-func NewNotifier(trigger <-chan interface{}, cleanup func()) Notifier {
+func NewNotifier(trigger <-chan interface{}) Notifier {
+	return NewNotifierWithCleanup(trigger, nil)
+}
+
+func NewNotifierWithCleanup(trigger <-chan interface{}, cleanup func()) Notifier {
 	return &notifier{
 		trigger: trigger,
 		cleanup: cleanup,
@@ -50,7 +54,7 @@ func NewNotifier(trigger <-chan interface{}, cleanup func()) Notifier {
 func NewTimerNotifier(interval time.Duration) Notifier {
 	ch := make(chan interface{})
 	stopCh := make(chan struct{})
-	notifier := NewNotifier(ch, func() { stopCh <- struct{}{} })
+	notifier := NewNotifierWithCleanup(ch, func() { stopCh <- struct{}{} })
 
 	t := time.NewTicker(interval)
 	go func() {
