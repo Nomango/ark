@@ -102,27 +102,27 @@ func (l *Logger) Errorf(msg string, args ...interface{}) {
 }
 
 // Debugw prints key-value pairs
-func (l *Logger) Debugw(msg string, kvs ...KV) {
+func (l *Logger) Debugw(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelDebug, msg, kvs...)
 }
 
 // Infow prints key-value pairs
-func (l *Logger) Infow(msg string, kvs ...KV) {
+func (l *Logger) Infow(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelInfo, msg, kvs...)
 }
 
 // Noticew prints key-value pairs
-func (l *Logger) Noticew(msg string, kvs ...KV) {
+func (l *Logger) Noticew(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelNotice, msg, kvs...)
 }
 
 // Warnw prints key-value pairs
-func (l *Logger) Warnw(msg string, kvs ...KV) {
+func (l *Logger) Warnw(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelWarn, msg, kvs...)
 }
 
 // Errorw prints key-value pairs
-func (l *Logger) Errorw(msg string, kvs ...KV) {
+func (l *Logger) Errorw(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelError, msg, kvs...)
 }
 
@@ -152,27 +152,27 @@ func (l *Logger) CtxErrorf(ctx context.Context, msg string, args ...interface{})
 }
 
 // CtxDebugw prints key-value pairs
-func (l *Logger) CtxDebugw(ctx context.Context, msg string, kvs ...KV) {
+func (l *Logger) CtxDebugw(ctx context.Context, msg string, kvs ...KeyValue) {
 	l.ctxWritew(ctx, LevelDebug, msg, kvs...)
 }
 
 // CtxInfow prints key-value pairs
-func (l *Logger) CtxInfow(ctx context.Context, msg string, kvs ...KV) {
+func (l *Logger) CtxInfow(ctx context.Context, msg string, kvs ...KeyValue) {
 	l.ctxWritew(ctx, LevelInfo, msg, kvs...)
 }
 
 // CtxNoticew prints key-value pairs
-func (l *Logger) CtxNoticew(ctx context.Context, msg string, kvs ...KV) {
+func (l *Logger) CtxNoticew(ctx context.Context, msg string, kvs ...KeyValue) {
 	l.ctxWritew(ctx, LevelNotice, msg, kvs...)
 }
 
 // CtxWarnw prints key-value pairs
-func (l *Logger) CtxWarnw(ctx context.Context, msg string, kvs ...KV) {
+func (l *Logger) CtxWarnw(ctx context.Context, msg string, kvs ...KeyValue) {
 	l.ctxWritew(ctx, LevelWarn, msg, kvs...)
 }
 
 // CtxErrorw prints key-value pairs
-func (l *Logger) CtxErrorw(ctx context.Context, msg string, kvs ...KV) {
+func (l *Logger) CtxErrorw(ctx context.Context, msg string, kvs ...KeyValue) {
 	l.ctxWritew(ctx, LevelError, msg, kvs...)
 }
 
@@ -181,11 +181,11 @@ func (l *Logger) getOption() option {
 	return opt
 }
 
-func (l *Logger) ctxWritew(ctx context.Context, level Level, msg string, kvs ...KV) {
+func (l *Logger) ctxWritew(ctx context.Context, level Level, msg string, kvs ...KeyValue) {
 	if level < l.getOption().level {
 		return
 	}
-	kvs = append([]KV{{Key: "msg", Value: msg}}, kvs...)
+	kvs = append([]KeyValue{{Key: "msg", Value: msg}}, kvs...)
 	ctx = withKV(ctx, kvs...)
 	l.ctxWrite(ctx, level, "")
 }

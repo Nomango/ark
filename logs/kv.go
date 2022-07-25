@@ -6,40 +6,47 @@ import (
 	"strings"
 )
 
-// KV is a key-value pair
-type KV struct {
+// KeyValue is a key-value pair
+type KeyValue struct {
 	Key   string
 	Value interface{}
 }
 
+func KV(key string, value interface{}) KeyValue {
+	return KeyValue{
+		Key:   key,
+		Value: value,
+	}
+}
+
 // CtxWithKVs append key-value pairs to context
-func CtxWithKVs(ctx context.Context, kvs ...KV) context.Context {
+func CtxWithKVs(ctx context.Context, kvs ...KeyValue) context.Context {
 	return withKV(ctx, kvs...)
 }
 
 // CtxGetKVs returns key-value pairs from context
-func CtxGetKVs(ctx context.Context) []KV {
+func CtxGetKVs(ctx context.Context) []KeyValue {
 	return getKVs(ctx)
 }
 
 // FlatKVs returns key-value pairs from flat interface slice
-func FlatKVs(kvis ...interface{}) []KV {
+func FlatKVs(kvis ...interface{}) []KeyValue {
 	if len(kvis)%2 != 0 {
 		kvis = append(kvis, "%MISSING%")
 	}
-	kvs := make([]KV, 0, len(kvis))
+	kvs := make([]KeyValue, 0, len(kvis))
 	for i := 0; i < len(kvis); i += 2 {
-		kvs = append(kvs, KV{fmt.Sprint(kvis[i]), kvis[i+1]})
+		kvs = append(kvs, KeyValue{fmt.Sprint(kvis[i]), kvis[i+1]})
 	}
 	return kvs
 }
 
 type ctxKeyKV string
 
-func withKV(ctx context.Context, kvs ...KV) context.Context {
+func withKV(ctx context.Context, kvs ...KeyValue) context.Context {
 	key := ctxKeyKV("")
-	if oldkvs, ok := ctx.Value(key).([]KV); ok {
-		newkvs := make([]KV, 0, len(oldkvs)+len(kvs))
+	if oldkvs, ok := ctx.Value(key).([]KeyValue); ok {
+		newkvs := make([]KeyValue, 0, len(oldkvs)+len(kvs))
 		exists := make(map[string]int)
 		for idx, kv := range oldkvs {
 			newkvs = append(newkvs, kv)
@@ -59,15 +66,15 @@ func withKV(ctx context.Context, kvs ...KV) context.Context {
 	return context.WithValue(ctx, key, kvs)
 }
 
-func getKVs(ctx context.Context) []KV {
+func getKVs(ctx context.Context) []KeyValue {
 	key := ctxKeyKV("")
-	kvs, _ := ctx.Value(key).([]KV)
+	kvs, _ := ctx.Value(key).([]KeyValue)
 	return kvs
 }
 
 type ctxKeyKVString string
 
-func withKVString(ctx context.Context, kvs []KV) context.Context {
+func withKVString(ctx context.Context, kvs []KeyValue) context.Context {
 	key := ctxKeyKVString("")
 	hasValuer := false
 	for _, kv := range kvs {

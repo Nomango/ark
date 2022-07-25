@@ -37,27 +37,27 @@ func Errorf(msg string, args ...interface{}) {
 }
 
 // Debugw prints key-value pairs
-func Debugw(msg string, kvs ...KV) {
+func Debugw(msg string, kvs ...KeyValue) {
 	defaultLogger.Debugw(msg, kvs...)
 }
 
 // Infow prints key-value pairs
-func Infow(msg string, kvs ...KV) {
+func Infow(msg string, kvs ...KeyValue) {
 	defaultLogger.Infow(msg, kvs...)
 }
 
 // Noticew prints key-value pairs
-func Noticew(msg string, kvs ...KV) {
+func Noticew(msg string, kvs ...KeyValue) {
 	defaultLogger.Noticew(msg, kvs...)
 }
 
 // Warnw prints key-value pairs
-func Warnw(msg string, kvs ...KV) {
+func Warnw(msg string, kvs ...KeyValue) {
 	defaultLogger.Warnw(msg, kvs...)
 }
 
 // Errorw prints key-value pairs
-func Errorw(msg string, kvs ...KV) {
+func Errorw(msg string, kvs ...KeyValue) {
 	defaultLogger.Errorw(msg, kvs...)
 }
 
@@ -87,26 +87,26 @@ func CtxErrorf(ctx context.Context, msg string, args ...interface{}) {
 }
 
 // CtxDebugw prints key-value pairs
-func CtxDebugw(ctx context.Context, msg string, kvs ...KV) {
+func CtxDebugw(ctx context.Context, msg string, kvs ...KeyValue) {
 	defaultLogger.CtxDebugw(ctx, msg, kvs...)
 }
 
 // CtxInfow prints key-value pairs
-func CtxInfow(ctx context.Context, msg string, kvs ...KV) {
+func CtxInfow(ctx context.Context, msg string, kvs ...KeyValue) {
 	defaultLogger.CtxInfow(ctx, msg, kvs...)
 }
 
 // CtxNoticew prints key-value pairs
-func CtxNoticew(ctx context.Context, msg string, kvs ...KV) {
+func CtxNoticew(ctx context.Context, msg string, kvs ...KeyValue) {
 	defaultLogger.CtxNoticew(ctx, msg, kvs...)
 }
 
 // CtxWarnw prints key-value pairs
-func CtxWarnw(ctx context.Context, msg string, kvs ...KV) {
+func CtxWarnw(ctx context.Context, msg string, kvs ...KeyValue) {
 	defaultLogger.CtxWarnw(ctx, msg, kvs...)
 }
 
 // CtxErrorw prints key-value pairs
-func CtxErrorw(ctx context.Context, msg string, kvs ...KV) {
+func CtxErrorw(ctx context.Context, msg string, kvs ...KeyValue) {
 	defaultLogger.CtxErrorw(ctx, msg, kvs...)
 }

@@ -33,7 +33,7 @@ func WithLevel(level Level) Option {
 }
 
 // WithKVs returns an option that sets default key-value pairs
-func WithKVs(kvs ...KV) Option {
+func WithKVs(kvs ...KeyValue) Option {
 	return func(opt *option) {
 		opt.ctx = CtxWithKVs(opt.ctx, kvs...)
 	}
