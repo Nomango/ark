@@ -10,16 +10,19 @@ import (
 )
 
 func TestLoader(t *testing.T) {
-	ch := make(chan interface{})
+	ch := make(chan int)
 
-	alv := watcher.AutoLoad(context.Background(), watcher.NewNotifier(ch))
+	alv := watcher.AutoLoad(context.Background(), watcher.NewNotifier(ch), watcher.WithTransformer(func(ctx context.Context, i interface{}) interface{} {
+		return i.(int) + 100
+	}))
+
 	require.Equal(t, nil, alv.Load())
 
 	ch <- 1
 	time.Sleep(time.Millisecond * 50)
-	require.Equal(t, 1, alv.Load())
+	require.Equal(t, 101, alv.Load())
 
 	ch <- 2
 	time.Sleep(time.Millisecond * 50)
-	require.Equal(t, 2, alv.Load())
+	require.Equal(t, 102, alv.Load())
 }
