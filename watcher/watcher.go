@@ -2,17 +2,30 @@ package watcher
 
 import (
 	"context"
-	"time"
 
 	"github.com/Nomango/ark/logs"
 )
 
-type Notifier interface {
-	Trigger() <-chan interface{}
-	Cleanup()
+// Watch executes f every time n triggers
+func Watch(ctx context.Context, n Notifier, f func(interface{})) {
+	NewWatcher(n, f).Start(ctx)
 }
 
-func Watch(ctx context.Context, n Notifier, f func(interface{})) {
+type Watcher struct {
+	n    Notifier
+	f    func(interface{})
+	stop chan struct{}
+}
+
+func NewWatcher(n Notifier, f func(interface{})) *Watcher {
+	return &Watcher{
+		n:    n,
+		f:    f,
+		stop: make(chan struct{}),
+	}
+}
+
+func (w *Watcher) Start(ctx context.Context) {
 	ctx = logs.CtxWithKVs(ctx, logs.KV("from", "watcher"))
 	do := func(v interface{}) {
 		defer func() {
@@ -20,13 +33,13 @@ func Watch(ctx context.Context, n Notifier, f func(interface{})) {
 				logs.CtxErrorf(ctx, "PANIC occurred!!! msg=%v", e)
 			}
 		}()
-		f(v)
+		w.f(v)
 	}
 	go func() {
-		defer n.Cleanup()
+		defer w.n.Cleanup()
 		for {
 			select {
-			case v, ok := <-n.Trigger():
+			case v, ok := <-w.n.Trigger():
 				if !ok {
 					logs.CtxNoticef(ctx, "notifier is closed")
 					return
@@ -35,53 +48,14 @@ func Watch(ctx context.Context, n Notifier, f func(interface{})) {
 			case <-ctx.Done():
 				logs.CtxNoticef(ctx, "context is done, err=%v", ctx.Err())
 				return
-			}
-		}
-	}()
-}
-
-func NewNotifier(trigger <-chan interface{}) Notifier {
-	return NewNotifierWithCleanup(trigger, nil)
-}
-
-func NewNotifierWithCleanup(trigger <-chan interface{}, cleanup func()) Notifier {
-	return &notifier{
-		trigger: trigger,
-		cleanup: cleanup,
-	}
-}
-
-func NewTimerNotifier(interval time.Duration) Notifier {
-	ch := make(chan interface{})
-	stopCh := make(chan struct{})
-	notifier := NewNotifierWithCleanup(ch, func() { stopCh <- struct{}{} })
-
-	t := time.NewTicker(interval)
-	go func() {
-		defer t.Stop()
-		for {
-			select {
-			case v := <-t.C:
-				ch <- v
-			case <-stopCh:
+			case <-w.stop:
+				logs.CtxNoticef(ctx, "watcher is stoped")
 				return
 			}
 		}
 	}()
-	return notifier
 }
 
-type notifier struct {
-	trigger <-chan interface{}
-	cleanup func()
-}
-
-func (n *notifier) Trigger() <-chan interface{} {
-	return n.trigger
-}
-
-func (n *notifier) Cleanup() {
-	if n.cleanup != nil {
-		n.cleanup()
-	}
+func (w *Watcher) Stop() {
+	w.stop <- struct{}{}
 }

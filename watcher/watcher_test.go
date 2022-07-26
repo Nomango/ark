@@ -16,17 +16,16 @@ func TestWatcher(t *testing.T) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
-	n := watcher.NewTimerNotifier(time.Second)
+	n := watcher.NewTimerNotifier(time.Millisecond * 50)
 	f := func(interface{}) { atomic.AddInt32(&v, 1) }
 	watcher.Watch(ctx, n, f)
 
-	time.Sleep(time.Second / 2)
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond * 70)
 	require.EqualValues(t, 2, atomic.LoadInt32(&v))
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond * 50)
 	require.EqualValues(t, 3, atomic.LoadInt32(&v))
 
 	cancel()
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond * 50)
 	require.EqualValues(t, 3, atomic.LoadInt32(&v))
 }
