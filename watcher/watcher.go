@@ -29,14 +29,6 @@ func NewWatcher(n Notifier, f Executer) *Watcher {
 
 func (w *Watcher) Start(ctx context.Context) {
 	ctx = logs.CtxWithKVs(ctx, logs.KV("from", "watcher"))
-	do := func(v interface{}) {
-		defer func() {
-			if e := recover(); e != nil {
-				logs.CtxErrorf(ctx, "PANIC occurred!!! msg=%v", e)
-			}
-		}()
-		w.f(ctx, v)
-	}
 	go func() {
 		for {
 			select {
@@ -45,7 +37,7 @@ func (w *Watcher) Start(ctx context.Context) {
 					logs.CtxNoticef(ctx, "notifier is closed")
 					return
 				}
-				do(v)
+				w.Execute(ctx, v)
 			case <-ctx.Done():
 				logs.CtxNoticef(ctx, "context is done, err=%v", ctx.Err())
 				return
@@ -59,4 +51,17 @@ func (w *Watcher) Start(ctx context.Context) {
 
 func (w *Watcher) Stop() {
 	w.stop <- struct{}{}
+}
+
+func (w *Watcher) GetNotifier() Notifier {
+	return w.n
+}
+
+func (w *Watcher) Execute(ctx context.Context, v interface{}) {
+	defer func() {
+		if e := recover(); e != nil {
+			logs.CtxErrorf(ctx, "PANIC occurred!!! msg=%v", e)
+		}
+	}()
+	w.f(ctx, v)
 }

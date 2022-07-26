@@ -11,10 +11,10 @@ import (
 
 func TestLoader(t *testing.T) {
 	ch := make(chan int)
-
-	alv := watcher.AutoLoad(context.Background(), watcher.NewNotifier(ch), watcher.WithTransformer(func(ctx context.Context, i interface{}) interface{} {
+	transform := func(ctx context.Context, i interface{}) interface{} {
 		return i.(int) + 100
-	}))
+	}
+	alv := watcher.AutoLoad(context.Background(), watcher.NewNotifier(ch), watcher.WithTransformer(transform))
 
 	require.Equal(t, nil, alv.Load())
 
