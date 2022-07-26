@@ -11,6 +11,14 @@ import (
 // Valuer returns a value
 type Valuer func(ctx context.Context) interface{}
 
+func KVDefaultCallDepth(key string) KeyValue {
+	return KVCallDepth(key, 5)
+}
+
+func KVDefaultTimestamp(key string) KeyValue {
+	return KVTimestamp(key, time.RFC3339)
+}
+
 // KVCallDepth returns a Valuer that returns a pkg/file:line description of the caller.
 func KVCallDepth(key string, depth int) KeyValue {
 	return KeyValue{Key: key, Value: valuerCallDepth(depth)}
