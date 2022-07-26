@@ -16,7 +16,7 @@ func TestWatcher(t *testing.T) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
-	n := watcher.NewTimerNotifier(time.Millisecond * 50)
+	n := watcher.NewTickNotifier(time.Millisecond * 50)
 	f := func(context.Context, interface{}) { atomic.AddInt32(&v, 1) }
 	watcher.Watch(ctx, n, f)
 

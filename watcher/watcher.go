@@ -38,10 +38,9 @@ func (w *Watcher) Start(ctx context.Context) {
 		w.f(ctx, v)
 	}
 	go func() {
-		defer w.n.Cleanup()
 		for {
 			select {
-			case v, ok := <-w.n.Notify():
+			case v, ok := <-w.n:
 				if !ok {
 					logs.CtxNoticef(ctx, "notifier is closed")
 					return

@@ -1,79 +1,40 @@
 package watcher
 
-import "time"
+import (
+	"reflect"
+	"time"
+)
 
-// Notifier is a simple notifier model
-type Notifier interface {
-	Notify() <-chan interface{}
-	Cleanup()
+type Notifier <-chan interface{}
+
+// NewNotifier takes any readable channel type (chan or <-chan but not chan<-) and
+// exposes it as a Notifier
+func NewNotifier(ch interface{}) Notifier {
+	return Notifier(wrapChannel(ch))
 }
 
-func NewNotifier(ch <-chan interface{}) Notifier {
-	return NewNotifierWithCleanup(ch, nil)
-}
-
-func NewNotifierWithCleanup(ch <-chan interface{}, cleanup func()) Notifier {
-	return &notifier{
-		ch:      ch,
-		cleanup: cleanup,
-	}
-}
-
-func NewTimerNotifier(interval time.Duration) Notifier {
-	ch := make(chan interface{})
-	stopCh := make(chan struct{})
-	notifier := NewNotifierWithCleanup(ch, func() { stopCh <- struct{}{} })
-
+func NewTickNotifier(interval time.Duration) Notifier {
 	t := time.NewTicker(interval)
+	return NewNotifier(t.C)
+}
+
+func wrapChannel(ch interface{}) <-chan interface{} {
+	t := reflect.TypeOf(ch)
+	if t.Kind() != reflect.Chan || t.ChanDir()&reflect.RecvDir == 0 {
+		panic("channels: input to Wrap must be readable channel")
+	}
+	realChan := make(chan interface{})
+
 	go func() {
-		defer t.Stop()
+		v := reflect.ValueOf(ch)
 		for {
-			select {
-			case v := <-t.C:
-				ch <- v
-			case <-stopCh:
+			x, ok := v.Recv()
+			if !ok {
+				close(realChan)
 				return
 			}
+			realChan <- x.Interface()
 		}
 	}()
-	return notifier
-}
-
-type notifier struct {
-	ch      <-chan interface{}
-	cleanup func()
-}
-
-func (n *notifier) Notify() <-chan interface{} {
-	return n.ch
-}
-
-func (n *notifier) Cleanup() {
-	if n.cleanup != nil {
-		n.cleanup()
-	}
-}
-
-// Trigger is a simple trigger model
-type Trigger interface {
-	Notifier
-
-	Trigger() chan<- interface{}
-}
-
-func NewTrigger() Trigger {
-	ch := make(chan interface{})
-	return &trigger{
-		Notifier:  NewNotifierWithCleanup(ch, nil),
-		triggerCh: ch,
-	}
-}
-
-type trigger struct {
-	Notifier
-	triggerCh chan<- interface{}
-}
-
-func (t *trigger) Trigger() chan<- interface{} {
-	return t.triggerCh
+	return realChan
 }
