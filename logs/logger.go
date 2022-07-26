@@ -78,27 +78,27 @@ func (l *Logger) WithOption(opts ...Option) *Logger {
 
 // Debugf prints messages with LevelDebug
 func (l *Logger) Debugf(msg string, args ...interface{}) {
-	l.ctxWrite(context.Background(), LevelDebug, msg, args...)
+	l.ctxWritef(context.Background(), LevelDebug, msg, args...)
 }
 
 // Infof prints messages with LevelInfo
 func (l *Logger) Infof(msg string, args ...interface{}) {
-	l.ctxWrite(context.Background(), LevelInfo, msg, args...)
+	l.ctxWritef(context.Background(), LevelInfo, msg, args...)
 }
 
 // Noticef prints messages with LevelNotice
 func (l *Logger) Noticef(msg string, args ...interface{}) {
-	l.ctxWrite(context.Background(), LevelNotice, msg, args...)
+	l.ctxWritef(context.Background(), LevelNotice, msg, args...)
 }
 
 // Warnf prints messages with LevelWarn
 func (l *Logger) Warnf(msg string, args ...interface{}) {
-	l.ctxWrite(context.Background(), LevelWarn, msg, args...)
+	l.ctxWritef(context.Background(), LevelWarn, msg, args...)
 }
 
 // Errorf prints messages with LevelError
 func (l *Logger) Errorf(msg string, args ...interface{}) {
-	l.ctxWrite(context.Background(), LevelError, msg, args...)
+	l.ctxWritef(context.Background(), LevelError, msg, args...)
 }
 
 // Debugw prints key-value pairs
@@ -128,27 +128,27 @@ func (l *Logger) Errorw(msg string, kvs ...KeyValue) {
 
 // CtxDebugf prints key-value pairs first and then msgs
 func (l *Logger) CtxDebugf(ctx context.Context, msg string, args ...interface{}) {
-	l.ctxWrite(ctx, LevelDebug, msg, args...)
+	l.ctxWritef(ctx, LevelDebug, msg, args...)
 }
 
 // CtxInfof prints key-value pairs first and then msgs
 func (l *Logger) CtxInfof(ctx context.Context, msg string, args ...interface{}) {
-	l.ctxWrite(ctx, LevelInfo, msg, args...)
+	l.ctxWritef(ctx, LevelInfo, msg, args...)
 }
 
 // CtxNoticef prints key-value pairs first and then msgs
 func (l *Logger) CtxNoticef(ctx context.Context, msg string, args ...interface{}) {
-	l.ctxWrite(ctx, LevelNotice, msg, args...)
+	l.ctxWritef(ctx, LevelNotice, msg, args...)
 }
 
 // CtxWarnf prints key-value pairs first and then msgs
 func (l *Logger) CtxWarnf(ctx context.Context, msg string, args ...interface{}) {
-	l.ctxWrite(ctx, LevelWarn, msg, args...)
+	l.ctxWritef(ctx, LevelWarn, msg, args...)
 }
 
 // CtxErrorf prints key-value pairs first and then msgs
 func (l *Logger) CtxErrorf(ctx context.Context, msg string, args ...interface{}) {
-	l.ctxWrite(ctx, LevelError, msg, args...)
+	l.ctxWritef(ctx, LevelError, msg, args...)
 }
 
 // CtxDebugw prints key-value pairs
@@ -190,13 +190,20 @@ func (l *Logger) ctxWritew(ctx context.Context, level Level, msg string, kvs ...
 	l.ctxWrite(ctx, level, "")
 }
 
-func (l *Logger) ctxWrite(ctx context.Context, level Level, msg string, args ...interface{}) {
-	opt := l.getOption()
-	if level < opt.level {
+func (l *Logger) ctxWritef(ctx context.Context, level Level, msg string, args ...interface{}) {
+	if level < l.getOption().level {
 		return
 	}
 	if len(args) > 0 {
 		msg = fmt.Sprintf(msg, args...)
+	}
+	l.ctxWrite(ctx, level, msg)
+}
+
+func (l *Logger) ctxWrite(ctx context.Context, level Level, msg string) {
+	opt := l.getOption()
+	if level < opt.level {
+		return
 	}
 	opt.provider.Write(level, getKVString(opt.ctx)+getKVString(ctx)+msg)
 }
