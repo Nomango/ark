@@ -7,17 +7,19 @@ import (
 )
 
 // Watch executes f every time n triggers
-func Watch(ctx context.Context, n Notifier, f func(interface{})) {
+func Watch(ctx context.Context, n Notifier, f Executer) {
 	NewWatcher(n, f).Start(ctx)
 }
 
+type Executer = func(context.Context, interface{})
+
 type Watcher struct {
 	n    Notifier
-	f    func(interface{})
+	f    Executer
 	stop chan struct{}
 }
 
-func NewWatcher(n Notifier, f func(interface{})) *Watcher {
+func NewWatcher(n Notifier, f Executer) *Watcher {
 	return &Watcher{
 		n:    n,
 		f:    f,
@@ -33,13 +35,13 @@ func (w *Watcher) Start(ctx context.Context) {
 				logs.CtxErrorf(ctx, "PANIC occurred!!! msg=%v", e)
 			}
 		}()
-		w.f(v)
+		w.f(ctx, v)
 	}
 	go func() {
 		defer w.n.Cleanup()
 		for {
 			select {
-			case v, ok := <-w.n.Trigger():
+			case v, ok := <-w.n.Notify():
 				if !ok {
 					logs.CtxNoticef(ctx, "notifier is closed")
 					return

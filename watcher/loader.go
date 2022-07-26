@@ -35,6 +35,6 @@ func (l *Loader) Stop() {
 	l.w.Stop()
 }
 
-func (l *Loader) receive(v interface{}) {
+func (l *Loader) receive(ctx context.Context, v interface{}) {
 	l.v.Store(v)
 }
