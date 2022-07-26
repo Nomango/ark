@@ -12,7 +12,7 @@ import (
 type Valuer func(ctx context.Context) interface{}
 
 func KVDefaultCallDepth(key string) KeyValue {
-	return KVCallDepth(key, 5)
+	return KVCallDepth(key, 6)
 }
 
 func KVDefaultTimestamp(key string) KeyValue {
