@@ -11,6 +11,11 @@ func WithOption(opts ...Option) {
 	defaultLogger.WithOption(opts...)
 }
 
+// Logf prints messages with a specific level
+func Logf(level Level, msg string, args ...interface{}) {
+	defaultLogger.Logf(level, msg, args...)
+}
+
 // Debugf prints messages with LevelDebug
 func Debugf(msg string, args ...interface{}) {
 	defaultLogger.Debugf(msg, args...)
@@ -34,6 +39,11 @@ func Warnf(msg string, args ...interface{}) {
 // Errorf prints messages with LevelError
 func Errorf(msg string, args ...interface{}) {
 	defaultLogger.Errorf(msg, args...)
+}
+
+// Logw prints key-value pairs
+func Logw(level Level, msg string, kvs ...KeyValue) {
+	defaultLogger.Logw(level, msg, kvs...)
 }
 
 // Debugw prints key-value pairs
@@ -61,6 +71,11 @@ func Errorw(msg string, kvs ...KeyValue) {
 	defaultLogger.Errorw(msg, kvs...)
 }
 
+// CtxLogf prints messages with a specific level
+func CtxLogf(ctx context.Context, level Level, msg string, args ...interface{}) {
+	defaultLogger.CtxLogf(ctx, level, msg, args...)
+}
+
 // CtxDebugf prints key-value pairs first and then msgs
 func CtxDebugf(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.CtxDebugf(ctx, msg, args...)
@@ -84,6 +99,11 @@ func CtxWarnf(ctx context.Context, msg string, args ...interface{}) {
 // CtxErrorf prints key-value pairs first and then msgs
 func CtxErrorf(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.CtxErrorf(ctx, msg, args...)
+}
+
+// CtxLogw prints key-value pairs
+func CtxLogw(ctx context.Context, level Level, msg string, kvs ...KeyValue) {
+	defaultLogger.CtxLogw(ctx, level, msg, kvs...)
 }
 
 // CtxDebugw prints key-value pairs

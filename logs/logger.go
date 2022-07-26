@@ -76,6 +76,11 @@ func (l *Logger) WithOption(opts ...Option) *Logger {
 	return l
 }
 
+// Logf prints messages with a specific level
+func (l *Logger) Logf(level Level, msg string, args ...interface{}) {
+	l.ctxWritef(context.Background(), level, msg, args...)
+}
+
 // Debugf prints messages with LevelDebug
 func (l *Logger) Debugf(msg string, args ...interface{}) {
 	l.ctxWritef(context.Background(), LevelDebug, msg, args...)
@@ -99,6 +104,11 @@ func (l *Logger) Warnf(msg string, args ...interface{}) {
 // Errorf prints messages with LevelError
 func (l *Logger) Errorf(msg string, args ...interface{}) {
 	l.ctxWritef(context.Background(), LevelError, msg, args...)
+}
+
+// Logw prints key-value pairs
+func (l *Logger) Logw(level Level, msg string, kvs ...KeyValue) {
+	l.ctxWritew(context.Background(), level, msg, kvs...)
 }
 
 // Debugw prints key-value pairs
@@ -126,6 +136,11 @@ func (l *Logger) Errorw(msg string, kvs ...KeyValue) {
 	l.ctxWritew(context.Background(), LevelError, msg, kvs...)
 }
 
+// CtxLogf prints messages with a specific level
+func (l *Logger) CtxLogf(ctx context.Context, level Level, msg string, args ...interface{}) {
+	l.ctxWritef(ctx, level, msg, args...)
+}
+
 // CtxDebugf prints key-value pairs first and then msgs
 func (l *Logger) CtxDebugf(ctx context.Context, msg string, args ...interface{}) {
 	l.ctxWritef(ctx, LevelDebug, msg, args...)
@@ -149,6 +164,11 @@ func (l *Logger) CtxWarnf(ctx context.Context, msg string, args ...interface{}) 
 // CtxErrorf prints key-value pairs first and then msgs
 func (l *Logger) CtxErrorf(ctx context.Context, msg string, args ...interface{}) {
 	l.ctxWritef(ctx, LevelError, msg, args...)
+}
+
+// CtxLogw prints key-value pairs
+func (l *Logger) CtxLogw(ctx context.Context, level Level, msg string, kvs ...KeyValue) {
+	l.ctxWritew(ctx, level, msg, kvs...)
 }
 
 // CtxDebugw prints key-value pairs
