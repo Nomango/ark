@@ -1,6 +1,7 @@
 package slices_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Nomango/ark/slices"
@@ -33,4 +34,27 @@ func TestHead(t *testing.T) {
 
 	result = slices.Head([]int{1, 2, 3}, 0)
 	require.Equal(t, result, []int{})
+}
+
+func TestShuffle(t *testing.T) {
+	a := []int{1, 2, 4, 5, 90, 11}
+	slices.Shuffle(a)
+	fmt.Println("shuffle: ", a)
+	slices.Shuffle(a)
+	fmt.Println("shuffle again: ", a)
+
+	b := []struct {
+		Name  string
+		Value int
+	}{
+		{"a", 1},
+		{"b", 2},
+		{"c", 3},
+		{"d", 4},
+	}
+
+	slices.Shuffle(b)
+	fmt.Println("shuffle: ", b)
+	slices.Shuffle(b)
+	fmt.Println("shuffle again: ", b)
 }

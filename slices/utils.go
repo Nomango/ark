@@ -1,5 +1,7 @@
 package slices
 
+import "math/rand"
+
 // Filter filter slice, keep element if filter returns true
 func Filter[T any](s []T, filter func(T) bool) []T {
 	if len(s) == 0 {
@@ -20,4 +22,10 @@ func Head[T any](s []T, n int) []T {
 		return s
 	}
 	return s[:n]
+}
+
+func Shuffle[T any](s []T) {
+	rand.Shuffle(len(s), func(i, j int) {
+		s[i], s[j] = s[j], s[i]
+	})
 }
